@@ -1,0 +1,80 @@
+version: '3.8'
+services:
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  # product-api:
+    # build:
+      # context: ./product-api
+      # dockerfile: Dockerfile
+    # ports:
+      # - "8081:8081"
+    # depends_on:
+      # - postgres
+
+  # client-api:
+    # build:
+      # context: ./client-api
+      # dockerfile: Dockerfile
+    # ports:
+      # - "8082:8082"
+    # depends_on:
+      # - postgres
+
+  # worker:
+    # build:
+      # context: ./worker
+      # dockerfile: Dockerfile
+    # depends_on:
+      # - kafka
+      # - mongodb
+      # - redis
+      # - product-api
+      # - client-api
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: myapp
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5433:5432"
+    volumes:
+     - postgres_data:/var/lib/postgresql/data
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6380:6379"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+
+volumes:
+  postgres_data:
+  mongodb_data:
