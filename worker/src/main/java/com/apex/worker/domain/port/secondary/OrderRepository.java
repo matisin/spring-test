@@ -4,4 +4,6 @@ import com.apex.worker.domain.entity.Order;
 
 public interface OrderRepository {
     boolean save(Order order);
+
+    Order findById(String id);
 }
